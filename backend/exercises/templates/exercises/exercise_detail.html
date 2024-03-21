@@ -1,0 +1,44 @@
+{% extends "base_template.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ exercise.title }}</h1>
+    <p>{{ exercise.description }}</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="userQuery">Your SQL Query:</label>
+            <textarea class="form-control" id="userQuery" name="userQuery" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Query</button>
+    </form>
+
+    <!-- Display feedback -->
+    {% if feedback %}
+        <div class="alert alert-danger mt-4">{{ feedback }}</div>
+    {% endif %}
+    
+    <!-- Display query results dynamically -->
+    {% if results %}
+        <h3 class="mt-4">Results</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for column in columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                    <tr>
+                        {% for item in row %}
+                            <td>{{ item }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

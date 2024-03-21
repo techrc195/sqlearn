@@ -22,34 +22,48 @@ class ExerciseDetailView(DetailView):
     template_name = 'exercises/exercise_detail.html'
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()  # Assign the detailed object to self.object
+        self.object = self.get_object()
         user_query = request.POST.get('userQuery')
+        solution_query = self.object.solution
         feedback = ''
-        results = []
+        feedback_type = 'danger'  # default to red for errors or mismatches
         columns = []
 
+        # Try parsing the user's query to ensure it's a SELECT statement
         try:
             parsed = sqlparse.parse(user_query)[0]
             if not parsed.get_type() == 'SELECT':
                 raise ValueError("Only SELECT queries are allowed.")
+            # Execute user query and fetch results
+            user_results, columns = self.execute_and_fetch(user_query)
+            # Assuming direct result set comparison is needed
+            # Execute solution query and fetch results for comparison
+            solution_results, _ = self.execute_and_fetch(solution_query)
+            # Simplified comparison: Check if user results match the solution's results
+            if sorted(user_results) == sorted(solution_results):
+                feedback = "Your query's results match the expected solution."
+                feedback_type = 'success'
+            else:
+                feedback = "The query results do not match the expected solution."
         except ValueError as e:
             feedback = str(e)
-        else:
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute(user_query)
-                    columns = [col[0] for col in cursor.description] if cursor.description else []
-                    results = cursor.fetchall()
-            except ProgrammingError as e:
-                feedback = f"Error executing the SQL query: {e}"
+        except ProgrammingError as e:
+            feedback = f"Error executing the SQL query: {e}"
 
-        context = self.get_context_data(user_query=user_query, feedback=feedback, results=results, columns=columns)
+        context = self.get_context_data(
+            object=self.object,
+            user_query=user_query,
+            feedback=feedback,
+            feedback_type=feedback_type,
+            results=user_results if 'user_results' in locals() else [],
+            columns=columns
+        )
         return render(request, self.template_name, context)
-    
-    def fetch_results(self, cursor):
-        "Fetch results in a dictionary format."
-        columns = [col[0] for col in cursor.description]
-        return [
-            dict(zip(columns, row))
-            for row in cursor.fetchall()
-        ]
+
+    def execute_and_fetch(self, query):
+        "Execute a query and fetch results in a dictionary format."
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            columns = [col[0] for col in cursor.description] if cursor.description else []
+            results = cursor.fetchall()
+            return results, columns

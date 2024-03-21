@@ -15,7 +15,12 @@
 
     <!-- Display feedback -->
     {% if feedback %}
-        <div class="alert alert-danger mt-4">{{ feedback }}</div>
+        <div class="alert alert-{{ feedback_type }} mt-4">{{ feedback }}</div>
+    {% endif %}
+    
+    <!-- Optionally, display a success message if the query is correct -->
+    {% if feedback == "Your query is correct!" %}
+        <div class="alert alert-success mt-4">Congratulations! Your query is correct.</div>
     {% endif %}
     
     <!-- Display query results dynamically -->
@@ -39,6 +44,9 @@
                 {% endfor %}
             </tbody>
         </table>
+    {% elif user_query %}
+        <!-- Show a message if there are no results but a query was submitted -->
+        <div class="alert alert-info mt-4">No results to display for your query.</div>
     {% endif %}
 </div>
 {% endblock %}

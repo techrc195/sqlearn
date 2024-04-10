@@ -33,10 +33,13 @@ def compare_results_precise(user_query, solution_query, user_results, solution_r
     solution_ast = parse_one(solution_query)
 
     # Calculate AST Diff
-    transformations = diff(user_ast, solution_ast)  
+    transformations = diff(user_ast, solution_ast)
+    print("Type of transformations:", type(transformations))
+    if transformations: 
+        print(dir(transformations[0]))  
 
     # Check if all transformations are 'Keep'
-    return all(transformation.get('type') == 'keep' for transformation in transformations)
+    return all(transformation.expression == 'keep' for transformation in transformations)
 
 class ExerciseListView(ListView):
     model = Exercise
@@ -100,13 +103,11 @@ class ExerciseDetailView(DetailView):
                 User Query: {user_query}
                 Solution Query: {solution_query}
                 **Task:**  
-                Identify the specific changes needed in the User Query to make it produce the exact same output as the Solution Query.  Analyze the User Query, Solution Query, and the provided AST Diff to pinpoint these required modifications. 
+                Identify the specific changes needed in the User Query to make it produce the exact same output as the Solution Query.  Analyze the User Query, Solution Query, and the provided AST Diff to pinpoint these required modifications.
+                then provide guidance to the user on how they need to adjust their query to match the solution 
                 **Output Format:**
-                Provide the missing elements in a clear, step-by-step format. Focus on:
-                * Additional clauses that need to be added (e.g., WHERE, JOIN)
-                * Changes to existing clauses
-                * Columns that need to be added or removed from the SELECT statement
-                Do Not provide the solution query only the steps needed to match the solution. Add an empty line between each step you provide.
+                Provide clear instructions on what the user query needs to match the solution query and the exercise, in a step-by-step format.
+                Do Not provide the solution query only the steps needed to match the solution. Only provide the changes needed to match the solution query. Try to not repeat yourself.
                 AST Diff: {transformations}""" 
 
 

@@ -5,8 +5,10 @@ from datetime import date
 import random
 from faker import Faker
 import psycopg2
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 django.setup() 
-from exercises.models import Food, Pet, Owner, Owns, Purchases 
+from exercises.models import Food, Pet, Owner, Owns, Purchases, Likes
 
 
 
@@ -93,7 +95,7 @@ def generate_pets(all_owner_ids):
     for _ in range(num_pets):
         name = fake.first_name_nonbinary()
         age = fake.random_int(min=1, max=15)
-        street = fake.street_address()
+        street_number = fake.street_address()  # Field name adjusted
         city = fake.city()
         zipcode = fake.zipcode()
         state = fake.state_abbr()
@@ -103,10 +105,10 @@ def generate_pets(all_owner_ids):
         pet = Pet(
             name=name,
             age=age,
-            streetnumber=street,
-            city=city,
-            zipcode=zipcode,
-            state=state,
+            StreetNumber=street_number,  # Field name adjusted
+            City=city,
+            ZipCode=zipcode,
+            State=state,
             typeofpet=typeofpet,
             owner=owner 
         )
@@ -135,19 +137,15 @@ def generate_owns(all_pet_ids, all_owner_ids):
         owns.save()
  
 def generate_likes(all_pet_ids, all_food_ids):
-    all_foods = Food.objects.all()
-    food_dict = {food.FoodID: food for food in all_foods}
-
     for pet_id in all_pet_ids:
         pet = Pet.objects.get(PetID=pet_id)
-        num_likes = random.randint(1, 3)
+        num_likes = random.randint(1, 3) 
         liked_food_ids = random.sample(all_food_ids, num_likes)
 
         for food_id in liked_food_ids:
-            food_object = food_dict[food_id]
-            pet.liked_foods.add(food_object)
-
-        pet.save()
+            food = Food.objects.get(FoodID=food_id)  
+            like = Likes(pet=pet, food=food) # Create the Likes object
+            like.save() 
 
 def generate_purchases(all_pet_ids, all_owner_ids, all_food_ids):
     num_months = 12 

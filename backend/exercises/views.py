@@ -1,3 +1,4 @@
+from tokenize import TokenError
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
@@ -29,6 +30,13 @@ def compare_results_precise(user_query, solution_query, user_results, solution_r
         return False
 
     # Parse Queries into ASTs
+    print("User query before parsing:", user_query)  # Inspect the input
+
+    try:
+        user_ast = parse_one(user_query)
+    except TokenError as e:
+        print(f"Full Tokenization Error: {e}")
+        
     user_ast = parse_one(user_query)
     solution_ast = parse_one(solution_query)
 
@@ -39,7 +47,17 @@ def compare_results_precise(user_query, solution_query, user_results, solution_r
         print(dir(transformations[0]))  
 
     # Check if all transformations are 'Keep'
-    return all(transformation.expression == 'keep' for transformation in transformations)
+    for transformation in transformations:
+        print(type(transformation))
+    print(transformations)
+    return all(
+        t.__class__.__name__ == 'Keep' or  # Check class name
+        (
+            t.__class__.__name__ == 'Update' and 
+            t.source == t.target
+        ) 
+        for t in transformations
+   )
 
 class ExerciseListView(ListView):
     model = Exercise
@@ -75,7 +93,7 @@ class ExerciseDetailView(DetailView):
 
             print("Executing User Query:", user_query)
             # Execute user query and fetch results
-            user_results, columns = self.execute_and_fetch(user_query)
+            user_results, _ = self.execute_and_fetch(user_query)
 
             # Assuming direct result set comparison is needed
             # Execute solution query and fetch results for comparison
@@ -107,7 +125,7 @@ class ExerciseDetailView(DetailView):
                 then provide guidance to the user on how they need to adjust their query to match the solution 
                 **Output Format:**
                 Provide clear instructions on what the user query needs to match the solution query and the exercise, in a step-by-step format.
-                Do Not provide the solution query only the steps needed to match the solution. Only provide the changes needed to match the solution query. Try to not repeat yourself.
+                Only provied correction steps no AS diff output. Do Not provde output of transformations. Do Not provide the solution query only the steps needed to match the solution. Only provide the changes needed to match the solution query. Try to not repeat yourself.
                 AST Diff: {transformations}""" 
 
 

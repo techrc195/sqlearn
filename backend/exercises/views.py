@@ -119,7 +119,6 @@ class ExerciseDetailView(DetailView):
                 # Construct a prompt based on the transformations 
                 prompt = f"""{exercise}
                 User Query: {user_query}
-                Solution Query: {solution_query}
                 **Task:**  
                 Identify the specific changes needed in the User Query to make it produce the exact same output as the Solution Query.  Analyze the User Query, Solution Query, and the provided AST Diff to pinpoint these required modifications.
                 then provide guidance to the user on how they need to adjust their query to match the solution 

@@ -80,7 +80,7 @@ class ExerciseDetailView(DetailView):
         self.object = self.get_object()
         user_query = request.POST.get('userQuery')
         solution_query = self.object.solution
-        excercise = self.object.description
+        excercise = self.object.description 
         feedback = ''
         feedback_type = 'danger'  # default to red for errors or mismatches
         columns = []
@@ -99,6 +99,7 @@ class ExerciseDetailView(DetailView):
                 results=user_results if 'user_results' in locals() else [],
                 columns=columns  
             )
+            context['next_exercise'] = self.get_next_exercise() 
             
             if request.POST.get('action') == 'preview':
                 return render(request, self.template_name, context) 
@@ -156,6 +157,12 @@ class ExerciseDetailView(DetailView):
         context['feedback'] = feedback
         context['feedback_type'] = feedback_type
         return render(request, self.template_name, context)
+    
+    def get_next_exercise(self):
+        try:
+            return Exercise.objects.filter(difficulty=self.object.difficulty, id__gt=self.object.id).order_by('id').first() 
+        except Exercise.DoesNotExist:
+            return None
 
     def execute_and_fetch(self, query):
         "Execute a query and fetch results in a dictionary format."

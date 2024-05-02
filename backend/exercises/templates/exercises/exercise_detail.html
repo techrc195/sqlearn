@@ -4,6 +4,10 @@
 <div class="container mt-4">
     <h1>{{ exercise.title }}</h1>
     <p>{{ exercise.description | safe }}</p>
+    <div class="schema-section">
+        <h3>Schema Description:</h3>
+        <pre>{{ object.schema_description }}</pre> 
+    </div>
     <form action="" method="post">
         {% csrf_token %}
         <div class="form-group">
@@ -12,6 +16,7 @@
         </div>
         <button type="submit" class="btn btn-secondary" id="preview-button" name="action" value="preview">Preview</button>
         <button type="submit" class="btn btn-primary">Submit Query</button>
+        <button type="button" class="btn btn-primary" id="next-button">Next</button>
     </form>
 
     <!-- Display feedback -->
@@ -49,5 +54,10 @@
         <!-- Show a message if there are no results but a query was submitted -->
         <div class="alert alert-info mt-4">No results to display for your query.</div>
     {% endif %}
+    <script>
+        document.getElementById('next-button').addEventListener('click', function() {
+            window.location.href = "/exercises/" + {{ next_exercise.pk }} + "/"; 
+        });
+    </script>
 </div>
 {% endblock %}

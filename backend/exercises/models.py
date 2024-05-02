@@ -2,6 +2,7 @@ from django.db import models
 
 class Exercise(models.Model):
     title = models.CharField(max_length=255)
+    schema_description = models.TextField(blank=True)
     description = models.TextField()
     solution = models.TextField()
     difficulty = models.CharField(max_length=10)
@@ -13,38 +14,38 @@ class Exercise(models.Model):
         return self.title
     
 class Owner(models.Model):
-    OID = models.AutoField(primary_key=True)  
-    LastName = models.CharField(max_length=50)
-    StreetNumber = models.CharField(max_length=50) 
-    City = models.CharField(max_length=50)
-    ZipCode = models.CharField(max_length=10)
-    State = models.CharField(max_length=2)
-    Age = models.IntegerField() 
-    AnnualIncome = models.DecimalField(max_digits=10, decimal_places=2)
+    oid = models.AutoField(primary_key=True)  
+    lastname = models.CharField(max_length=50)
+    streetnumber = models.CharField(max_length=50) 
+    city = models.CharField(max_length=50)
+    zipcode = models.CharField(max_length=10)
+    state = models.CharField(max_length=2)
+    age = models.IntegerField() 
+    annualincome = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         db_table = 'owners'
 
 class Food(models.Model):
-    FoodID = models.AutoField(primary_key=True)
-    Name = models.CharField(max_length=50)
-    Brand = models.CharField(max_length=50)
-    TypeofFood = models.CharField(max_length=20)
-    Price = models.DecimalField(max_digits=10, decimal_places=2)
-    ItemWeight = models.DecimalField(max_digits=10, decimal_places=2)
-    ClassofFood = models.CharField(max_length=20)
+    foodid = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    brand = models.CharField(max_length=50)
+    typeoffood = models.CharField(max_length=20)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    itemweight = models.DecimalField(max_digits=10, decimal_places=2)
+    classoffood = models.CharField(max_length=20)
 
     class Meta:
         db_table = 'foods'
 
 class Pet(models.Model):
-    PetID = models.AutoField(primary_key=True) 
+    petid = models.AutoField(primary_key=True) 
     name = models.CharField(max_length=255)
     age = models.IntegerField()
-    StreetNumber = models.CharField(max_length=255) # Renamed for consistency
-    City = models.CharField(max_length=50)
-    ZipCode = models.CharField(max_length=10)
-    State = models.CharField(max_length=2)
+    streetnumber = models.CharField(max_length=255) # Renamed for consistency
+    city = models.CharField(max_length=50)
+    zipcode = models.CharField(max_length=10)
+    state = models.CharField(max_length=2)
     typeofpet = models.CharField(max_length=50) 
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, db_column='oid') 
     liked_foods = models.ManyToManyField(Food, through='Likes', related_name='liked_by_pets')
@@ -53,22 +54,22 @@ class Pet(models.Model):
         db_table = 'pets'
 
 class Owns(models.Model):
-    PetID = models.ForeignKey(Pet, on_delete=models.CASCADE, db_column='petid') 
-    Year = models.IntegerField()
-    OID = models.ForeignKey(Owner, on_delete=models.CASCADE, db_column='oid')
-    PetAgeatOwnership = models.IntegerField()
-    PricePaid = models.DecimalField(max_digits=10, decimal_places=2)
+    petid = models.ForeignKey(Pet, on_delete=models.CASCADE, db_column='petid') 
+    year = models.IntegerField()
+    oid = models.ForeignKey(Owner, on_delete=models.CASCADE, db_column='oid')
+    petageatownership = models.IntegerField()
+    pricepaid = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         db_table = 'owns'
 
 class Purchases(models.Model):
-    OID = models.ForeignKey(Owner, on_delete=models.CASCADE, db_column='oid')
-    FoodID = models.ForeignKey(Food, on_delete=models.CASCADE, db_column='foodid')
-    PetID = models.ForeignKey(Pet, on_delete=models.CASCADE, db_column='petid')
-    Month = models.IntegerField()
-    Year = models.IntegerField()
-    Quantity = models.IntegerField()
+    oid = models.ForeignKey(Owner, on_delete=models.CASCADE, db_column='oid')
+    foodid = models.ForeignKey(Food, on_delete=models.CASCADE, db_column='foodid')
+    petid = models.ForeignKey(Pet, on_delete=models.CASCADE, db_column='petid')
+    month = models.IntegerField()
+    year = models.IntegerField()
+    quantity = models.IntegerField()
 
     class Meta:
         db_table = 'purchases' 

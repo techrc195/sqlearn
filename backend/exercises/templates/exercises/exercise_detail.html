@@ -3,13 +3,14 @@
 {% block content %}
 <div class="container mt-4">
     <h1>{{ exercise.title }}</h1>
-    <p>{{ exercise.description }}</p>
+    <p>{{ exercise.description | safe }}</p>
     <form action="" method="post">
         {% csrf_token %}
         <div class="form-group">
             <label for="userQuery">Your SQL Query:</label>
             <textarea class="form-control" id="userQuery" name="userQuery" rows="3"></textarea>
         </div>
+        <button type="submit" class="btn btn-secondary" id="preview-button" name="action" value="preview">Preview</button>
         <button type="submit" class="btn btn-primary">Submit Query</button>
     </form>
 

@@ -19,6 +19,7 @@ SQLearn is a Django-based web application designed to help you master SQL concep
 2.  **Install Dependencies:**
     ```bash
     cd sqlearn
+    cd backend
     pip install -r requirements.txt
     ```
 
